@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación Track 1: Formación Andragógica y Modelo Kirkpatrick</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            background-color: #f3f2f1;
+            margin: 0;
+            padding: 0;
+            color: #323130;
+        }
+
+        .header-bg {
+            background-color: #008272; /* Color institucional estilo MS Forms (Teal) */
+            height: 140px;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 680px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 0 2px rgba(0,0,0,0.05);
+            padding: 40px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .card-header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background-color: #008272;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-top: 0;
+            color: #323130;
+        }
+
+        .description {
+            font-size: 14px;
+            color: #605e5c;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .required-notice {
+            color: #a4262c; /* Rojo Microsoft */
+            font-size: 13px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 28px;
+        }
+
+        label.main-label {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .required-asterisk {
+            color: #a4262c !important; /* Rojo Microsoft */
+            margin-left: 4px;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            max-width: 400px;
+            border: none;
+            border-bottom: 1px solid #a19f9d;
+            padding: 8px 0;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-bottom: 2px solid #008272;
+        }
+
+        .question-card {
+            margin-bottom: 35px;
+            border-bottom: 1px solid #f3f2f1;
+            padding-bottom: 20px;
+        }
+
+        .question-card:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .question-text {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            line-height: 1.4;
+        }
+
+        .option-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            position: relative;
+            padding-left: 30px;
+            user-select: none;
+            line-height: 1.3;
+        }
+
+        .option-container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .checkmark {
+            position: absolute;
+            top: 1px;
+            left: 0;
+            height: 18px;
+            width: 18px;
+            background-color: #fff;
+            border: 1px solid #8a8886;
+            border-radius: 50%;
+        }
+
+        .option-container:hover input ~ .checkmark {
+            background-color: #f3f2f1;
+        }
+
+        .option-container input:checked ~ .checkmark {
+            border-color: #008272;
+            background-color: #fff;
+        }
+
+        .checkmark::after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .option-container input:checked ~ .checkmark::after {
+            display: block;
+        }
+
+        .option-container .checkmark::after {
+            top: 4px;
+            left: 4px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #008272;
+        }
+
+        .btn-submit {
+            background-color: #008272;
+            color: #ffffff;
+            border: none;
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: background-color 0.15s;
+        }
+
+        .btn-submit:hover {
+            background-color: #00695c;
+        }
+
+        .btn-submit:disabled {
+            background-color: #c8c6c4;
+            color: #a19f9d;
+            cursor: not-allowed;
+        }
+
+        /* Vistas de Resultados y Retroalimentación */
+        .results-header {
+            text-align: center;
+            border-bottom: 1px solid #e1dfdd;
+            padding-bottom: 25px;
+            margin-bottom: 25px;
+        }
+
+        .score-badge {
+            display: inline-block;
+            background-color: #008272;
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            padding: 15px 30px;
+            border-radius: 50px;
+            margin: 15px 0;
+        }
+
+        .score-legend {
+            font-size: 16px;
+            color: #323130;
+            font-weight: 600;
+        }
+
+        .feedback-item {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 4px;
+            background-color: #faf9f8;
+            border-left: 4px solid #a19f9d;
+        }
+
+        .feedback-item.correct {
+            border-left: 4px solid #107c41; /* Verde éxito de MS Excel/Forms */
+            background-color: #f1faf1;
+        }
+
+        .feedback-item.incorrect {
+            border-left: 4px solid #a4262c; /* Rojo error de MS Forms */
+            background-color: #fdf3f4;
+        }
+
+        .feedback-status {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-correct {
+            color: #107c41;
+        }
+
+        .status-incorrect {
+            color: #a4262c;
+        }
+
+        .feedback-text {
+            font-size: 14px;
+            margin-top: 10px;
+            padding: 12px;
+            background: #ffffff;
+            border: 1px dashed #d2d0ce;
+            border-radius: 4px;
+            color: #323130;
+            line-height: 1.45;
+        }
+
+        .feedback-title {
+            font-weight: bold;
+            color: #008272;
+            margin-bottom: 4px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .user-answer {
+            font-size: 14px;
+            margin: 6px 0;
+        }
+
+        .correct-answer-display {
+            font-size: 14px;
+            font-weight: 600;
+            color: #107c41;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-bg"></div>
+
+    <div class="container">
+        <!-- FORMULARIO DE EXAMEN -->
+        <form id="quizForm">
+            <div class="card card-header">
+                <h1>Evaluación Track 1: Andragogía y Kirkpatrick</h1>
+                <div class="description">
+                    Este examen consta de 10 preguntas seleccionadas de forma aleatoria a partir del banco de evaluaciones. Cada acierto equivale a 10 puntos (Total: 100 puntos). Al enviar la prueba se te mostrará de forma transparente el resultado y la retroalimentación de cada concepto.
+                </div>
+                <div class="required-notice">* Obligatorio</div>
+                
+                <div class="form-group">
+                    <label class="main-label" for="nombre">Nombre Completo<span class="required-asterisk">*</span></label>
+                    <input type="text" id="nombre" required placeholder="Escriba su respuesta">
+                </div>
+            </div>
+
+            <!-- Contenedor de Preguntas Dinámicas -->
+            <div class="card">
+                <div id="questionsContainer"></div>
+            </div>
+
+            <div style="margin-bottom: 40px;">
+                <button type="submit" id="submitBtn" class="btn-submit">Enviar respuestas</button>
+            </div>
+        </form>
+
+        <!-- PANEL DE RETROALIMENTACIÓN Y ÉXITO -->
+        <div class="card" id="successCard" style="display: none;">
+            <div class="results-header">
+                <h1 style="color: #008272; margin-bottom: 10px;">¡Examen Finalizado!</h1>
+                <p>Tus respuestas han sido procesadas e ingresadas con éxito en el sistema de calificaciones.</p>
+                
+                <div class="score-badge" id="scoreValue">0 / 100</div>
+                <div class="score-legend" id="scoreText">Puntaje obtenido</div>
+            </div>
+
+            <h3 style="margin-top: 30px; font-size: 18px; border-bottom: 2px solid #008272; padding-bottom: 8px;">
+                Revisión y Retroalimentación Pedagógica
+            </h3>
+            
+            <div id="feedbackContainer">
+                <!-- Se inyectará la retroalimentación detallada -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURACIÓN: Pega aquí la URL de tu Web App ejecutada en Google Apps Script
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx16R-SSl9w5cKZ_UMGn2TvRHnoz_sy6oqbACSrs-tzkwNkrHXlChU-C90_IGso9v9m/exec";
+
+        // Banco completo de 50 preguntas con sus respuestas y "Refuerzo" (Retroalimentación)
+        const questionBank = [
+            { id: 1, text: "¿Cuál es el orden correcto de los 4 niveles del modelo de Kirkpatrick?", options: ["Reacción, aprendizaje, comportamiento, resultado", "Resultado, comportamiento, aprendizaje, reacción", "Aprendizaje, reacción, resultado, comportamiento", "Reacción, resultado, aprendizaje, comportamiento"], correct: 0, feedback: "N1 Reacción (¿les gustó?), N2 Aprendizaje (¿aprendieron?), N3 Comportamiento/Transferencia (¿lo aplican?), N4 Resultado (¿mejoró el negocio?)." },
+            { id: 2, text: "El Nivel 3 de Kirkpatrick (Comportamiento) mide:", options: ["Si a los participantes les gustó el curso", "Si aplican lo aprendido en su puesto de trabajo", "Si aprobaron el examen escrito", "Si mejoró el ROI del negocio"], correct: 1, feedback: "El N3 es la META: la transferencia real. No es un examen, es un comportamiento observable en faena." },
+            { id: 3, text: "Una capacitación de bloqueo tuvo 95 % de aprobación en la prueba escrita, pero los operadores no aplican el bloqueo en terreno. ¿Qué nivel falló?", options: ["Nivel 1 (Reacción)", "Nivel 2 (Aprendizaje)", "Nivel 3 (Comportamiento)", "Ninguno: fue exitosa"], correct: 2, feedback: "Aprobar la prueba es N2. Si no se aplica en el turno, falló el N3 (transferencia). El conocimiento sin conducta observable no protege a los colaboradores." },
+            { id: 4, text: "¿Cuál es la MEJOR evidencia de que una capacitación logró transferencia (Nivel 3)?", options: ["El número de diapositivas cubiertas", "Una encuesta de satisfacción con buena nota", "Un certificado de asistencia firmado", "La observación en terreno de que el operador ejecuta la tarea en su turno"], correct: 3, feedback: "Observar directamente la ejecución real en el puesto de trabajo bajo condiciones estándar es la prueba máxima del Nivel 3 (Transferencia)." },
+            { id: 5, text: "¿Cuál de estos es un objetivo bien formulado para el Nivel 3?", options: ["Ejecutar el bloqueo del molino en cada mantención cumpliendo los 6 pasos en el tiempo definido", "Conocer el procedimiento de bloqueo", "Entender la importancia de la seguridad", "Que el operador valore el bloqueo"], correct: 0, feedback: "Un objetivo de Nivel 3 requiere un verbo observable, una acción específica y criterios claros de ejecución en el puesto de trabajo." },
+            { id: 6, text: "Un objetivo de Nivel 3 (KirtPatrick 3) debe contener:", options: ["Solo un verbo y un tema", "Verbo observable + contenido + condición + criterio", "Una nota mínima de aprobación", "El nombre del curso y su duración"], correct: 1, feedback: "Debe ser completamente medible: Verbo de acción + qué hace + bajo qué condiciones + con qué nivel de calidad o tiempo límite." },
+            { id: 7, text: "¿Cuál de estos verbos NO sirve para un objetivo de Nivel 3 (no es observable)?", options: ["Ejecutar", "Demostrar", "Conocer", "Realizar"], correct: 2, feedback: "El verbo 'Conocer' es interno y cognitivo. No es directamente observable en terreno a menos que se traduzca en una acción física o demostración verbal." },
+            { id: 8, text: "Tienes un grupo con 25 años de experiencia. ¿Cuál es la mejor decisión andragógica al iniciar?", options: ["Explicar todo desde cero porque tienen malas costumbres", "Darles el manual para leer en silencio", "Evaluarlos primero para mostrar lo que no saben", "Preguntar cómo resuelven hoy ese problema y construir sobre su experiencia"], correct: 3, feedback: "La andragogía dicta que la experiencia del adulto es su recurso más valioso. Construye conocimiento a partir de sus saberes empíricos anteriores." },
+            { id: 9, text: "En el aprendizaje adulto, la experiencia previa del operador es:", options: ["Materia prima y un recurso clave del aprendizaje", "Solamente hay que corregir", "Irrelevante para la formación técnica", "Útil solo para los novatos"], correct: 0, feedback: "La experiencia no es solo información de fondo; es la base estructural sobre la cual anclan los nuevos procedimientos técnicos de forma significativa." },
+            { id: 10, text: "Un operador contradice al formador con un caso real de su turno. ¿Qué hace un formador con visión de futuro?", options: ["Reafirma su autoridad y sigue con el guion", "Lo escucha, valida su experiencia y la usa como caso", "Le pide guardar sus comentarios para el final", "Lo corrige delante de todos"], correct: 1, feedback: "Valida su experiencia andragógicamente. La horizontalidad permite que el error o caso particular se convierta en una valiosa oportunidad de aprendizaje mutuo." },
+            { id: 11, text: "La frase 'el formador activa la experiencia del otro, de forma simétrica-similar' describe el principio de:", options: ["Flexibilidad", "Participación", "Horizontalidad", "Motivación"], correct: 2, feedback: "Horizontalidad: El formador y el adulto están al mismo nivel jerárquico de respeto intelectual y técnico, intercambiando experiencias simétricas." },
+            { id: 12, text: "¿Cuál es la diferencia central entre pedagogía y andragogía?", options: ["La pedagogía es para adultos y la andragogía para niños", "No hay diferencia real", "La andragogía solo se usa en línea", "El alumno es dependiente; el adulto es co-decisor de su aprendizaje"], correct: 3, feedback: "El adulto tiene autoconcepto de independencia y autonomía, por lo tanto, debe co-decidir y participar activamente en el proceso educativo." },
+            { id: 13, text: "En una capacitación, el instructor habla el 80 % del tiempo y los operadores escuchan. ¿Qué afirmas?", options: ["Es pedagogía: el adulto queda pasivo y aprende poco", "Es andragogía bien aplicada", "Es lo ideal para adultos con experiencia", "Es correcto si el tema es técnico"], correct: 0, feedback: "Un adulto pasivo retiene muy poco. Las sesiones expositivas largas vulneran el principio de participación activa." },
+            { id: 14, text: "Quieres que lo aprendido se aplique en el turno. ¿Qué estrategia lo asegura mejor?", options: ["Agregar más teoría y diapositivas", "Practicar la tarea real en condiciones de faena con retroalimentación", "Tomar una prueba escrita más difícil", "Alargar la duración del curso"], correct: 1, feedback: "La práctica simulada interactiva bajo condiciones idénticas a las de su turno, complementada con feedback inmediato, maximiza la transferencia." },
+            { id: 15, text: "Para que una habilidad se aplique en el turno, lo más efectivo es:", options: ["Agregar más teoría", "Mostrar más diapositivas", "Practicarla en condiciones similares a la faena", "Tomar un examen escrito"], correct: 2, feedback: "El entrenamiento técnico requiere simulación pragmática y repetición en un ambiente seguro que emule la realidad operativa." },
+            { id: 16, text: "Un operador pregunta '¿para qué me sirve esto?' en los primeros minutos. ¿Qué indica?", options: ["Que es un operador conflictivo", "Que hay que sancionarlo", "Que no quiere aprender", "Que necesita ver la utilidad inmediata (regla de 3 minutos)"], correct: 3, feedback: "Regla de los 3 minutos: El adulto necesita comprender de inmediato el valor práctico, la utilidad y el beneficio directo de lo que aprenderá." },
+            { id: 17, text: "Respecto a su propio aprendizaje, el adulto:", options: ["Co-decide y dirige su proceso", "Depende totalmente del docente", "Necesita que se lo impongan", "Aprende igual que un niño"], correct: 0, feedback: "El autoconcepto de autonomía fomenta que el adulto dirija sus metas de aprendizaje basadas en sus brechas profesionales." },
+            { id: 18, text: "Comparado con un instructor externo, el formador interno tiene:", options: ["La misma probabilidad de transferencia", "6 veces más probabilidad de generar transferencia", "Menos efectividad", "Solo ventaja teórica"], correct: 1, feedback: "Estudios demuestran que el formador interno, al compartir el lenguaje, el contexto operativo y el día a día, eleva drásticamente la tasa de transferencia en terreno." },
+            { id: 19, text: "¿Cuál es la diferencia entre Nivel 3 y Nivel 4 de Kirkpatrick?", options: ["Nivel 3 mide el negocio y Nivel 4 la conducta", "Son lo mismo", "Nivel 3 mide la conducta en terreno y Nivel 4 el resultado con KPI", "Nivel 3 es una encuesta"], correct: 2, feedback: "El N3 evalúa comportamientos aplicados en el puesto; el N4 mide el impacto directo en los resultados de la compañía (seguridad, producción, costos)." },
+            { id: 20, text: "La meta principal de un formador con visión de futuro es que el participante:", options: ["Disfrute la sesión", "Apruebe el examen", "Asista a todas las sesiones", "Aplique lo aprendido en su faena (Nivel 3)"], correct: 3, feedback: "El éxito final de una formación no radica en un aula o examen aprobado (N2), sino en el cambio de conducta segura en terreno (N3)." },
+            { id: 21, text: "¿Cuáles son los 6 principios de Malcolm Knowles?", options: ["Necesidad de saber, autoconcepto, experiencia previa, disposición, orientación y motivación", "Participación, flexibilidad, IA, microlearning y evaluación", "Reacción, aprendizaje, comportamiento, resultado, prueba y transferencia", "Atención, memoria, repetición, examen, nota y premio"], correct: 0, feedback: "Son los pilares del aprendizaje de adultos desarrollados por Knowles para estructurar cualquier experiencia andragógica." },
+            { id: 22, text: "Los 3 principios andragógicos operativos son:", options: ["Disciplina, jerarquía y orden", "Participación, horizontalidad y flexibilidad", "Teoría, práctica y examen", "Rapidez, memoria y repetición"], correct: 1, feedback: "Participación (hacer activamente), Horizontalidad (relación simétrica) y Flexibilidad (adaptación al grupo y sus turnos) operan el modelo en el aula." },
+            { id: 23, text: "La 'regla de oro 50/50' significa que:", options: ["Aprueba la mitad del grupo", "El curso dura la mitad", "Al menos el 50 % del tiempo el participante practica, no solo escucha", "Se divide el grupo en dos"], correct: 2, feedback: "El diseño instruccional moderno exige que el formador hable como máximo el 50% de la clase, dejando el otro 50% para la experimentación del alumno." },
+            { id: 24, text: "El adulto consolida el conocimiento principalmente:", options: ["Escuchando al instructor", "Viendo videos", "Memorizando definiciones", "Mediante la acción y la práctica"], correct: 3, feedback: "La andragogía es esencialmente activa. Aprendemos mejor haciendo, fallando y corrigiendo en un ambiente controlado." },
+            { id: 25, text: "Para una tarea de alto riesgo (ej. trabajo en altura), es imprescindible:", options: ["Práctica supervisada con corrección antes de ir a terreno", "Un video y una firma", "Solo explicar el procedimiento", "Una charla motivacional"], correct: 0, feedback: "La teoría no sustituye la psicomotricidad controlada ni la habituación segura que demanda una tarea crítica de alto riesgo." },
+            { id: 26, text: "La retroalimentación más efectiva para el adulto es:", options: ["General y al final del curso", "Inmediata, específica y centrada en la conducta", "Pública y comparativa con los demás", "Solo la nota del examen"], correct: 1, feedback: "La retroalimentación debe entregarse tan pronto ocurra la acción, describiendo la conducta observable sin juicios de valor de carácter personal." },
+            { id: 27, text: "La retroalimentación debe centrarse en:", options: ["La persona ('eres descuidado')", "La comparación con otros", "La conducta ('faltó este paso del bloqueo')", "La actitud general"], correct: 2, feedback: "Corregir el procedimiento de manera objetiva ('el candado no quedó asegurado') mantiene la autoestima del participante y promueve la mejora rápida." },
+            { id: 28, text: "Para que un operador admita 'no sé hacer esto', el formador necesita crear:", options: ["Presión y miedo a la sanción", "Exposición pública de los errores", "Competencia entre participantes", "Un clima donde equivocarse es parte del aprendizaje"], correct: 3, feedback: "Seguridad psicológica: indispensable en andragogía para admitir brechas, practicar sin temor al ridículo y corregir conductas riesgosas antes de la operación." },
+            { id: 29, text: "El motor más potente del aprendizaje adulto es:", options: ["El propósito, el dominio del tema y la autoestima", "El premio o la nota", "El miedo a la sanción", "La obligación de la empresa"], correct: 0, feedback: "Los adultos se motivan intrínsecamente cuando perciben un propósito superior de autocuidado, crecimiento y superación técnica." },
+            { id: 30, text: "En el modelo de Knowles, la motivación es:", options: ["El primer principio", "El sexto principio fundamental del aprendizaje adulto", "No es un principio", "Solo motivación externa"], correct: 1, feedback: "La motivación para aprender (el sexto principio) surge de incentivos internos como la autosatisfacción, el progreso y la seguridad de volver sano a casa." },
+            { id: 31, text: "El módulo de formación adulta debe organizarse en torno a:", options: ["Capítulos teóricos en orden académico", "La historia del procedimiento", "Problemas reales a resolver del puesto", "Definiciones para memorizar"], correct: 2, feedback: "La orientación del adulto está volcada a la resolución pragmática de problemas y retos reales de su día a día laboral, no a la pura teoría descriptiva." },
+            { id: 32, text: "El principio de flexibilidad implica que el módulo:", options: ["Sigue el guion sin importar la realidad", "Agrega más teoría", "Se acorta siempre", "Se adapta dinámicamente al contexto del turno"], correct: 3, feedback: "Un facilitador andragógico ajusta el ritmo, los ejemplos e incluso las dinámicas considerando el cansancio, nivel de experiencia y condiciones climáticas del turno." },
+            { id: 33, text: "Según Knowles, sin un desafío o problema real:", options: ["No hay aprendizaje real, el desafío es parte de la motivación.", "Igual hay aprendizaje profundo", "El aprendizaje es mejor", "Da lo mismo"], correct: 0, feedback: "El detonante cognitivo del adulto es la necesidad de resolver una anomalía o enfrentar un desafío crítico de su puesto de trabajo." },
+            { id: 34, text: "Una barrera frecuente del aprendizaje adulto es:", options: ["Tener demasiada experiencia", "El autoconcepto negativo: miedo a fracasar como participante", "Exceso de confianza", "Aprender muy rápido"], correct: 1, feedback: "Muchos adultos temen ser expuestos o juzgados si cometen errores en una capacitación, lo que genera resistencia inicial al aprendizaje activo." },
+            { id: 35, text: "¿Cuáles son barreras típicas del aprendizaje adulto?", options: ["La falta de IA", "Solo la edad", "Restricciones de tiempo, autoconcepto negativo y programas que ignoran la andragogía", "El exceso de práctica"], correct: 2, feedback: "La fatiga física de los turnos, agendas apretadas y un diseño escolarizado inapropiado bloquean el aprendizaje efectivo de los operarios." },
+            { id: 36, text: "Malcolm Knowles es reconocido como:", options: ["Un economista del WEF", "Un ingeniero de minas", "El principal referente de la andragogía moderna", "El inventor de la pedagogía"], correct: 2, feedback: "Knowles formalizó los supuestos de cómo aprenden los adultos a lo largo del ciclo vital, distinguiéndolo sistemáticamente de la pedagogía." },
+            { id: 37, text: "Completa: 'El adulto no es un niño con más años, es un ___ distinto que aprende distinto.'", options: ["sujeto", "alumno", "empleado", "novato"], correct: 0, feedback: "El adulto es un sujeto con autonomía de voluntad, trayectoria acumulada y necesidades existenciales específicas que influyen en su cognición." },
+            { id: 38, text: "La 'regla de los 3 minutos' se refiere a:", options: ["La duración de la cápsula", "Mostrar el '¿para qué me sirve?' en los primeros 3 minutos", "El descanso entre módulos", "El tiempo del examen"], correct: 1, feedback: "Si en los primeros 3 minutos de tu capacitación no respondes el '¿para qué sirve?', perderás la atención del participante adulto." },
+            { id: 39, text: "En una sesión andragógica bien diseñada, lo ideal es que el participante esté:", options: ["Escuchando el 80 % del tiempo", "Solo observando", "Activo y participando más del 50 % del tiempo", "En silencio"], correct: 2, feedback: "La actividad mental y manual constante acelera la retención a largo plazo y fortalece la autoconfianza del operador." },
+            { id: 40, text: "La relación que propone la horizontalidad entre formador y operador es:", options: ["Vertical, de jefe a subordinado", "Estrictamente jerárquica", "Distante y formal", "Simétrica, de par a par"], correct: 3, feedback: "La horizontalidad elimina la distancia docente tradicional y establece un diálogo de respeto mutuo donde ambas experiencias aportan valor." },
+            { id: 41, text: "Según el WEF 2025, ¿qué porcentaje de las habilidades cambiará entre 2024 y 2030?", options: ["44 %", "33 %", "20 %", "60 %"], correct: 0, feedback: "Casi la mitad de las competencias operativas e industriales requerirán actualización técnica radical debido a la automatización de procesos." },
+            { id: 42, text: "La habilidad #1 al 2030 según el WEF, el 'Learning Agility', es:", options: ["Aprender más rápido que otros", "Aprender, desaprender y reaprender", "Memorizar sin error", "Usar tecnología"], correct: 1, feedback: "Agilidad de aprendizaje significa estar dispuesto a desechar métodos obsoletos para integrar metodologías seguras de manera continua." },
+            { id: 43, text: "Las organizaciones con alta inversión en formación interna crecen:", options: ["1.2 veces más rápido", "Igual que las demás", "2.4 veces más rápido", "5 veces más rápido"], correct: 2, feedback: "Invertir de manera estructurada en la habilitación técnica interna genera retornos directos en eficiencia operativa, reducción de incidentes y crecimiento." },
+            { id: 44, text: "Respecto a la IA en la formación, lo correcto es:", options: ["Reemplaza al formador", "Elimina la práctica en terreno", "Solo sirve para administrar", "Amplifica al formador, pero el criterio y conocimiento es de la persona."], correct: 3, feedback: "La tecnología acelera el diseño didáctico y el análisis de datos, pero la tutoría empática y la retroalimentación en terreno siguen recayendo en la persona." },
+            { id: 45, text: "¿Para qué sirve la IA como asistente del formador?", options: ["Diseño ágil, tutores virtuales y simuladores operacionales", "Solo para enviar correos", "Para reemplazar su criterio", "No tiene uso útil"], correct: 0, feedback: "Optimiza drásticamente los tiempos de desarrollo de módulos instruccionales, material didáctico interactivo y cuestionarios personalizados." },
+            { id: 46, text: "Un reto típico del aprendizaje a distancia en minería es:", options: ["Exceso de tiempo libre", "Turnos rotativos, conectividad limitada.", "Participantes muy jóvenes", "Aulas de sobra y excelente señal"], correct: 1, feedback: "El ecosistema industrial minero impone limitaciones geográficas y de jornada de trabajo que exigen herramientas flexibles asincrónicas." },
+            { id: 47, text: "En el aprendizaje a distancia, el adulto enfrenta:", options: ["Mayor atención que en presencial", "Ningún problema de atención", "Atención fragmentada y fatiga de pantalla", "Lo mismo que en presencial"], correct: 2, feedback: "A distancia hay atención fragmentada, fatiga cognitiva y pérdida del lenguaje corporal. Por ello, se debe diseñar bajo la modalidad de micro-cápsulas." },
+            { id: 48, text: "La duración recomendada de una micro-cápsula de aprendizaje es:", options: ["45 a 60 minutos", "Cerca de 2 horas", "Un día completo", "5 a 12 minutos"], correct: 3, feedback: "Microlearning: cápsulas de 5 a 12 min, móviles y de consumo inmediato entre turnos, ideales para combatir la fatiga cognitiva de pantallas." },
+            { id: 49, text: "El rol de las universidades corporativas frente al formador es:", options: ["Amplificarlo: registran, replican y escalan su conocimiento", "Reemplazarlo", "Eliminarlo", "No aportan nada"], correct: 0, feedback: "No reemplazan al facilitador experto en terreno; en su lugar, estandarizan, documentan y sistematizan sus saberes para hacerlos escalables." },
+            { id: 50, text: "El cambio de rol que propone el Track para el formador es:", options: ["De facilitador a instructor", "De formador a facilitador de experiencias de aprendizaje", "A evaluador", "A administrador"], correct: 1, feedback: "El facilitador andragógico evoluciona de ser 'el sabelotodo' que expone teorías, a un diseñador activo de dinámicas que detona la práctica colectiva." }
+        ];
+
+        let selectedQuestions = [];
+
+        // Inicializar el Examen: Seleccionar 10 aleatorias sin repetir
+        function initQuiz() {
+            const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
+            selectedQuestions = shuffled.slice(0, 10);
+            
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+
+            selectedQuestions.forEach((q, index) => {
+                const qDiv = document.createElement('div');
+                qDiv.className = 'question-card';
+                
+                let optionsHTML = '';
+                q.options.forEach((opt, optIndex) => {
+                    optionsHTML += `
+                        <label class="option-container">${opt}
+                            <input type="radio" name="q_${q.id}" value="${optIndex}" required>
+                            <span class="checkmark"></span>
+                        </label>
+                    `;
+                });
+
+                qDiv.innerHTML = `
+                    <div class="question-text">
+                        ${index + 1}. ${q.text} <span class="required-asterisk">*</span>
+                    </div>
+                    ${optionsHTML}
+                `;
+                container.appendChild(qDiv);
+            });
+        }
+
+        // Manejar el envío
+        document.getElementById('quizForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Enviando respuestas...";
+
+            const nombre = document.getElementById('nombre').value;
+            const hora = new Date().toLocaleString('es-CL', { timeZone: 'America/Santiago' }) || new Date().toLocaleString();
+            
+            let calificacion = 0;
+            let listadoPreguntasArr = [];
+            let userAnswers = {};
+
+            selectedQuestions.forEach(q => {
+                listadoPreguntasArr.push(q.id);
+                const selectedOpt = document.querySelector(`input[name="q_${q.id}"]:checked`);
+                const answerVal = selectedOpt ? parseInt(selectedOpt.value) : -1;
+                userAnswers[q.id] = answerVal;
+                
+                if (answerVal === q.correct) {
+                    calificacion += 10; // 10 puntos por cada acierto de un total de 10 preguntas
+                }
+            });
+
+            const listadoPreguntas = listadoPreguntasArr.join(',');
+
+            // Enviar datos por POST a Google Sheets
+            const payload = {
+                nombre: nombre,
+                hora: hora,
+                calificacion: calificacion,
+                listadoPreguntas: listadoPreguntas
+            };
+
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                // Ocultar formulario
+                document.getElementById('quizForm').style.display = 'none';
+                
+                // Mostrar pantalla de éxito y cargar la retroalimentación
+                const successCard = document.getElementById('successCard');
+                successCard.style.display = 'block';
+                
+                // Actualizar puntuación en la UI
+                const scoreValue = document.getElementById('scoreValue');
+                scoreValue.innerText = `${calificacion} / 100`;
+                
+                if (calificacion >= 70) {
+                    scoreValue.style.backgroundColor = "#107c41"; // Verde de aprobación
+                    document.getElementById('scoreText').innerText = "¡Felicidades, examen aprobado!";
+                } else {
+                    scoreValue.style.backgroundColor = "#a4262c"; // Rojo desaprobación
+                    document.getElementById('scoreText').innerText = "Examen no aprobado. Sigue practicando.";
+                }
+
+                // Generar lista de retroalimentación detallada
+                buildFeedbackUI(userAnswers);
+                window.scrollTo(0,0);
+            })
+            .catch(error => {
+                console.error('Error al enviar las respuestas:', error);
+                alert('Ocurrió un inconveniente al registrar tus respuestas. Por favor, reintenta el envío.');
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Enviar respuestas";
+            });
+        });
+
+        // Generar la interfaz de revisión y retroalimentación interactiva
+        function buildFeedbackUI(userAnswers) {
+            const feedbackContainer = document.getElementById('feedbackContainer');
+            feedbackContainer.innerHTML = '';
+
+            selectedQuestions.forEach((q, index) => {
+                const userAnswerIndex = userAnswers[q.id];
+                const isCorrect = userAnswerIndex === q.correct;
+                const feedbackDiv = document.createElement('div');
+                
+                feedbackDiv.className = `feedback-item ${isCorrect ? 'correct' : 'incorrect'}`;
+
+                let statusHTML = '';
+                if (isCorrect) {
+                    statusHTML = `
+                        <div class="feedback-status status-correct">
+                            <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                            Pregunta ${index + 1}: Correcta
+                        </div>
+                    `;
+                } else {
+                    statusHTML = `
+                        <div class="feedback-status status-incorrect">
+                            <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                            </svg>
+                            Pregunta ${index + 1}: Incorrecta
+                        </div>
+                    `;
+                }
+
+                const selectedText = userAnswerIndex !== -1 ? q.options[userAnswerIndex] : "Ninguna opción seleccionada";
+                const correctText = q.options[q.correct];
+
+                feedbackDiv.innerHTML = `
+                    ${statusHTML}
+                    <div style="font-weight: 600; font-size: 15px; margin-bottom: 10px;">${q.text}</div>
+                    <div class="user-answer">
+                        <strong>Tu respuesta:</strong> <span style="color: ${isCorrect ? '#107c41' : '#a4262c'}">${selectedText}</span>
+                    </div>
+                    ${!isCorrect ? `<div class="correct-answer-display"><strong>Respuesta correcta:</strong> ${correctText}</div>` : ''}
+                    
+                    <div class="feedback-text">
+                        <div class="feedback-title">Refuerzo Educativo</div>
+                        ${q.feedback}
+                    </div>
+                `;
+
+                feedbackContainer.appendChild(feedbackDiv);
+            });
+        }
+
+        // Cargar preguntas en la carga de página
+        window.onload = initQuiz;
+    </script>
+</body>
+</html>
