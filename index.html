@@ -707,12 +707,12 @@
                 const scoreValue = document.getElementById('scoreValue');
                 scoreValue.innerText = `${calificacion} / 100`;
                 
-                if (calificacion >= 70) {
+                if (calificacion >= 90) {
                     scoreValue.style.backgroundColor = "#107c41"; // Verde de aprobación
-                    document.getElementById('scoreText').innerText = "¡Felicidades, examen aprobado!";
+                    document.getElementById('scoreText').innerText = "¡Felicidades!";
                 } else {
                     scoreValue.style.backgroundColor = "#a4262c"; // Rojo de desaprobación
-                    document.getElementById('scoreText').innerText = "Examen no aprobado. Sigue practicando.";
+                    document.getElementById('scoreText').innerText = "Evaluación enviada.";
                 }
 
                 // Generar lista de retroalimentación detallada
