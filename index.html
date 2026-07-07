@@ -26,6 +26,7 @@
             max-width: 680px;
             margin: 40px auto;
             padding: 0 20px;
+            position: relative;
         }
 
         .card {
@@ -102,10 +103,74 @@
             border-bottom: 2px solid #008272;
         }
 
+        /* Estilo para el botón de inicio */
+        .btn-start {
+            background-color: #008272;
+            color: #ffffff;
+            border: none;
+            padding: 12px 30px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: background-color 0.15s;
+        }
+
+        .btn-start:hover {
+            background-color: #00695c;
+        }
+
+        /* Caja informativa del tiempo en pantalla de bienvenida */
+        .time-alert-box {
+            background-color: #fdf3f4;
+            border-left: 4px solid #a4262c;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 2px;
+            font-size: 14px;
+            color: #a4262c;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Reloj Flotante */
+        .timer-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ffffff;
+            border: 1px solid #d2d0ce;
+            padding: 10px 18px;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            font-weight: 700;
+            font-size: 16px;
+            color: #323130;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .timer-badge.warning {
+            border-color: #a4262c;
+            color: #a4262c;
+            background-color: #fdf3f4;
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.03); }
+        }
+
         .question-card {
             margin-bottom: 35px;
             border-bottom: 1px solid #f3f2f1;
-            padding-bottom: 20px;
+            padding-bottom: 25px;
         }
 
         .question-card:last-child {
@@ -199,7 +264,7 @@
             cursor: not-allowed;
         }
 
-        /* Vistas de Resultados y Retroalimentación */
+        /* Resultados y Retroalimentación */
         .results-header {
             text-align: center;
             border-bottom: 1px solid #e1dfdd;
@@ -233,12 +298,12 @@
         }
 
         .feedback-item.correct {
-            border-left: 4px solid #107c41; /* Verde éxito de MS Excel/Forms */
+            border-left: 4px solid #107c41; /* Verde éxito */
             background-color: #f1faf1;
         }
 
         .feedback-item.incorrect {
-            border-left: 4px solid #a4262c; /* Rojo error de MS Forms */
+            border-left: 4px solid #a4262c; /* Rojo error */
             background-color: #fdf3f4;
         }
 
@@ -290,6 +355,22 @@
             color: #107c41;
             margin-top: 4px;
         }
+
+        /* Ocultar elementos en versión móvil si el widget interrumpe, adaptándose responsivamente */
+        @media (max-width: 600px) {
+            .timer-badge {
+                position: sticky;
+                top: 0;
+                right: 0;
+                width: 100%;
+                box-sizing: border-box;
+                border-radius: 0;
+                text-align: center;
+                justify-content: center;
+                margin-bottom: 15px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+        }
     </style>
 </head>
 <body>
@@ -297,21 +378,43 @@
     <div class="header-bg"></div>
 
     <div class="container">
-        <!-- FORMULARIO DE EXAMEN -->
-        <form id="quizForm">
-            <div class="card card-header">
-                <h1>Evaluación Track 1: Andragogía y Kirkpatrick</h1>
-                <div class="description">
-                    Este examen consta de 10 preguntas seleccionadas de forma aleatoria a partir del banco de evaluaciones. Cada acierto equivale a 10 puntos (Total: 100 puntos). Al enviar la prueba se te mostrará de forma transparente el resultado y la retroalimentación de cada concepto.
-                </div>
-                <div class="required-notice">* Obligatorio</div>
-                
-                <div class="form-group">
-                    <label class="main-label" for="nombre">Nombre Completo<span class="required-asterisk">*</span></label>
-                    <input type="text" id="nombre" required placeholder="Escriba su respuesta">
-                </div>
+        
+        <!-- RELOJ FLOTANTE (Invisible hasta que comience el examen) -->
+        <div class="timer-badge" id="timerDisplay" style="display: none;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" style="display:inline-block; vertical-align:middle;">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+            </svg>
+            <span id="timeRemaining">30:00</span>
+        </div>
+
+        <!-- 1. PANTALLA DE BIENVENIDA / REGISTRO -->
+        <div id="welcomeCard" class="card card-header">
+            <h1>Evaluación Track 1: Andragogía y Kirkpatrick</h1>
+            <div class="description">
+                Bienvenido a la plataforma de evaluación institucional. Por favor, lee atentamente las siguientes instrucciones antes de comenzar:
             </div>
 
+            <div class="time-alert-box">
+                <svg width="22" height="22" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+                <span>ADVERTENCIA: Al iniciar el examen dispondrá de exactamente 30 minutos sin interrupción. Al finalizar este tiempo, sus respuestas se enviarán automáticamente con los avances registrados.</span>
+            </div>
+
+            <div class="required-notice">* Obligatorio</div>
+
+            <div class="form-group" style="margin-top: 20px;">
+                <label class="main-label" for="nombre">Nombre Completo del Alumno<span class="required-asterisk">*</span></label>
+                <input type="text" id="nombre" placeholder="Escriba su respuesta aquí..." required autocomplete="off">
+            </div>
+
+            <div style="margin-top: 30px;">
+                <button type="button" class="btn-start" onclick="startExam()">Iniciar Examen</button>
+            </div>
+        </div>
+
+        <!-- 2. FORMULARIO DE PREGUNTAS (Oculto al inicio) -->
+        <form id="quizForm" style="display: none;">
             <!-- Contenedor de Preguntas Dinámicas -->
             <div class="card">
                 <div id="questionsContainer"></div>
@@ -322,11 +425,11 @@
             </div>
         </form>
 
-        <!-- PANEL DE RETROALIMENTACIÓN Y ÉXITO -->
+        <!-- 3. PANEL DE RETROALIMENTACIÓN Y ÉXITO -->
         <div class="card" id="successCard" style="display: none;">
             <div class="results-header">
-                <h1 style="color: #008272; margin-bottom: 10px;">¡Examen Finalizado!</h1>
-                <p>Tus respuestas han sido procesadas e ingresadas con éxito en el sistema de calificaciones.</p>
+                <h1 style="color: #008272; margin-bottom: 10px;" id="successTitle">¡Examen Finalizado!</h1>
+                <p id="successDescription">Tus respuestas han sido procesadas e ingresadas con éxito en el sistema de calificaciones.</p>
                 
                 <div class="score-badge" id="scoreValue">0 / 100</div>
                 <div class="score-legend" id="scoreText">Puntaje obtenido</div>
@@ -381,7 +484,7 @@
             { id: 31, text: "El módulo de formación adulta debe organizarse en torno a:", options: ["Capítulos teóricos en orden académico", "La historia del procedimiento", "Problemas reales a resolver del puesto", "Definiciones para memorizar"], correct: 2, feedback: "La orientación del adulto está volcada a la resolución pragmática de problemas y retos reales de su día a día laboral, no a la pura teoría descriptiva." },
             { id: 32, text: "El principio de flexibilidad implica que el módulo:", options: ["Sigue el guion sin importar la realidad", "Agrega más teoría", "Se acorta siempre", "Se adapta dinámicamente al contexto del turno"], correct: 3, feedback: "Un facilitador andragógico ajusta el ritmo, los ejemplos e incluso las dinámicas considerando el cansancio, nivel de experiencia y condiciones climáticas del turno." },
             { id: 33, text: "Según Knowles, sin un desafío o problema real:", options: ["No hay aprendizaje real, el desafío es parte de la motivación.", "Igual hay aprendizaje profundo", "El aprendizaje es mejor", "Da lo mismo"], correct: 0, feedback: "El detonante cognitivo del adulto es la necesidad de resolver una anomalía o enfrentar un desafío crítico de su puesto de trabajo." },
-            { id: 34, text: "Una barrera frecuente del aprendizaje adulto es:", options: ["Tener demasiada experiencia", "El autoconcepto negativo: miedo a fracasar como participante", "Exceso de confianza", "Aprender muy rápido"], correct: 1, feedback: "Muchos adultos temen ser expuestos o juzgados si cometen errores en una capacitación, lo que genera resistencia inicial al aprendizaje activo." },
+            { id: 34, text: "Una barrera de aprendizaje adulto frecuente es:", options: ["Tener demasiada experiencia", "El autoconcepto negativo: miedo a fracasar como participante", "Exceso de confianza", "Aprender muy rápido"], correct: 1, feedback: "Muchos adultos temen ser expuestos o juzgados si cometen errores en una capacitación, lo que genera resistencia inicial al aprendizaje activo." },
             { id: 35, text: "¿Cuáles son barreras típicas del aprendizaje adulto?", options: ["La falta de IA", "Solo la edad", "Restricciones de tiempo, autoconcepto negativo y programas que ignoran la andragogía", "El exceso de práctica"], correct: 2, feedback: "La fatiga física de los turnos, agendas apretadas y un diseño escolarizado inapropiado bloquean el aprendizaje efectivo de los operarios." },
             { id: 36, text: "Malcolm Knowles es reconocido como:", options: ["Un economista del WEF", "Un ingeniero de minas", "El principal referente de la andragogía moderna", "El inventor de la pedagogía"], correct: 2, feedback: "Knowles formalizó los supuestos de cómo aprenden los adultos a lo largo del ciclo vital, distinguiéndolo sistemáticamente de la pedagogía." },
             { id: 37, text: "Completa: 'El adulto no es un niño con más años, es un ___ distinto que aprende distinto.'", options: ["sujeto", "alumno", "empleado", "novato"], correct: 0, feedback: "El adulto es un sujeto con autonomía de voluntad, trayectoria acumulada y necesidades existenciales específicas que influyen en su cognición." },
@@ -401,9 +504,12 @@
         ];
 
         let selectedQuestions = [];
+        let timerInterval = null;
+        let examEndTime = null; // Guardará la marca de tiempo exacta en que debe finalizar
+        let examSubmitted = false;
 
-        // Inicializar el Examen: Seleccionar 10 aleatorias sin repetir
-        function initQuiz() {
+        // Mezclar aleatoriamente el banco de preguntas y seleccionar 10
+        function prepareQuestions() {
             const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
             selectedQuestions = shuffled.slice(0, 10);
             
@@ -418,7 +524,7 @@
                 q.options.forEach((opt, optIndex) => {
                     optionsHTML += `
                         <label class="option-container">${opt}
-                            <input type="radio" name="q_${q.id}" value="${optIndex}" required>
+                            <input type="radio" name="q_${q.id}" value="${optIndex}">
                             <span class="checkmark"></span>
                         </label>
                     `;
@@ -434,13 +540,122 @@
             });
         }
 
-        // Manejar el envío
+        // Ejecutar al dar clic en "Iniciar Examen"
+        function startExam() {
+            const nombreInput = document.getElementById('nombre');
+            const nombreVal = nombreInput.value.trim();
+
+            if (!nombreVal) {
+                nombreInput.reportValidity();
+                nombreInput.focus();
+                return;
+            }
+
+            // Ocultar pantalla de bienvenida
+            document.getElementById('welcomeCard').style.display = 'none';
+
+            // Preparar las preguntas seleccionadas
+            prepareQuestions();
+
+            // Mostrar el formulario del examen y el temporizador
+            document.getElementById('quizForm').style.display = 'block';
+            document.getElementById('timerDisplay').style.display = 'flex';
+
+            // Iniciar el temporizador regresivo basado en timestamps
+            startTimer();
+        }
+
+        // Lógica del Temporizador robusto e inmune a la inactividad de pestañas
+        function startTimer() {
+            const timerDisplay = document.getElementById('timerDisplay');
+            const timeRemainingText = document.getElementById('timeRemaining');
+
+            // Definimos la marca de tiempo de finalización exacta (30 minutos a partir de ahora)
+            examEndTime = Date.now() + (30 * 60 * 1000);
+
+            // Función de actualización visual
+            function updateTimer() {
+                const now = Date.now();
+                const timeLeftMs = examEndTime - now;
+
+                if (timeLeftMs <= 0) {
+                    clearInterval(timerInterval);
+                    timeRemainingText.innerText = "00:00";
+                    autoSubmitExam(); // Forzar el envío inmediato
+                    return;
+                }
+
+                // Convertir milisegundos restantes a segundos, minutos y segundos
+                const timeRemainingSeconds = Math.floor(timeLeftMs / 1000);
+                const minutes = Math.floor(timeRemainingSeconds / 60);
+                const seconds = timeRemainingSeconds % 60;
+                
+                const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                timeRemainingText.innerText = formattedTime;
+
+                // Alerta visual de tiempo crítico (menos de 5 minutos / 300 segundos)
+                if (timeRemainingSeconds <= 300) {
+                    timerDisplay.classList.add('warning');
+                } else {
+                    timerDisplay.classList.remove('warning');
+                }
+            }
+
+            // Ejecución inicial instantánea para evitar lag visual de 1 segundo
+            updateTimer();
+
+            // Sincronizamos a intervalos rápidos de 500ms para asegurar fluidez y precisión
+            timerInterval = setInterval(updateTimer, 500);
+        }
+
+        // Envío Automático al agotarse el tiempo
+        function autoSubmitExam() {
+            if (examSubmitted) return;
+            
+            // Cambiar textos de la pantalla final para informar al alumno del tiempo excedido
+            document.getElementById('successTitle').innerText = "¡Tiempo Agotado!";
+            document.getElementById('successDescription').innerText = "El límite de 30 minutos ha finalizado. Sus respuestas registradas hasta este momento han sido enviadas automáticamente.";
+            
+            submitProcess(true); // Forzar envío sin validar campos obligatorios
+        }
+
+        // Manejar el submit manual por el alumno
         document.getElementById('quizForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
+            // Validar que el alumno haya seleccionado al menos una opción para cada pregunta
+            let allAnswered = true;
+            selectedQuestions.forEach(q => {
+                const checked = document.querySelector(`input[name="q_${q.id}"]:checked`);
+                if (!checked) {
+                    allAnswered = false;
+                }
+            });
+
+            if (!allAnswered) {
+                alert("Por favor, responda todas las preguntas antes de enviar su examen.");
+                return;
+            }
+
+            // Cambiar textos al formato estándar de éxito
+            document.getElementById('successTitle').innerText = "¡Examen Finalizado!";
+            document.getElementById('successDescription').innerText = "Tus respuestas han sido procesadas e ingresadas con éxito en el sistema de calificaciones.";
+
+            submitProcess(false);
+        });
+
+        // Proceso común de envío
+        function submitProcess(isAutoSubmit = false) {
+            if (examSubmitted) return;
+            examSubmitted = true;
+
+            // Detener el conteo del temporizador
+            if (timerInterval) clearInterval(timerInterval);
+
+            // Bloquear los botones de acción
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.innerText = "Enviando respuestas...";
+            submitBtn.innerText = "Enviando resultados...";
 
             const nombre = document.getElementById('nombre').value;
             const hora = new Date().toLocaleString('es-CL', { timeZone: 'America/Santiago' }) || new Date().toLocaleString();
@@ -456,13 +671,13 @@
                 userAnswers[q.id] = answerVal;
                 
                 if (answerVal === q.correct) {
-                    calificacion += 10; // 10 puntos por cada acierto de un total de 10 preguntas
+                    calificacion += 10; // Cada pregunta vale 10 puntos (Total: 100 puntos)
                 }
             });
 
             const listadoPreguntas = listadoPreguntasArr.join(',');
 
-            // Enviar datos por POST a Google Sheets
+            // Crear objeto de envío hacia Apps Script
             const payload = {
                 nombre: nombre,
                 hora: hora,
@@ -470,6 +685,7 @@
                 listadoPreguntas: listadoPreguntas
             };
 
+            // Enviar datos vía POST a la Web App de Google Sheet
             fetch(WEB_APP_URL, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -479,8 +695,9 @@
                 body: JSON.stringify(payload)
             })
             .then(() => {
-                // Ocultar formulario
+                // Ocultar formulario de examen y reloj
                 document.getElementById('quizForm').style.display = 'none';
+                document.getElementById('timerDisplay').style.display = 'none';
                 
                 // Mostrar pantalla de éxito y cargar la retroalimentación
                 const successCard = document.getElementById('successCard');
@@ -494,21 +711,22 @@
                     scoreValue.style.backgroundColor = "#107c41"; // Verde de aprobación
                     document.getElementById('scoreText').innerText = "¡Felicidades, examen aprobado!";
                 } else {
-                    scoreValue.style.backgroundColor = "#a4262c"; // Rojo desaprobación
+                    scoreValue.style.backgroundColor = "#a4262c"; // Rojo de desaprobación
                     document.getElementById('scoreText').innerText = "Examen no aprobado. Sigue practicando.";
                 }
 
                 // Generar lista de retroalimentación detallada
                 buildFeedbackUI(userAnswers);
-                window.scrollTo(0,0);
+                window.scrollTo(0, 0);
             })
             .catch(error => {
                 console.error('Error al enviar las respuestas:', error);
-                alert('Ocurrió un inconveniente al registrar tus respuestas. Por favor, reintenta el envío.');
+                alert('Ocurrió un inconveniente al registrar tus respuestas. Por favor, reporta este inconveniente.');
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Enviar respuestas";
+                examSubmitted = false;
             });
-        });
+        }
 
         // Generar la interfaz de revisión y retroalimentación interactiva
         function buildFeedbackUI(userAnswers) {
@@ -543,7 +761,7 @@
                     `;
                 }
 
-                const selectedText = userAnswerIndex !== -1 ? q.options[userAnswerIndex] : "Ninguna opción seleccionada";
+                const selectedText = userAnswerIndex !== -1 ? q.options[userAnswerIndex] : "Ninguna opción seleccionada (Tiempo agotado)";
                 const correctText = q.options[q.correct];
 
                 feedbackDiv.innerHTML = `
@@ -563,9 +781,6 @@
                 feedbackContainer.appendChild(feedbackDiv);
             });
         }
-
-        // Cargar preguntas en la carga de página
-        window.onload = initQuiz;
     </script>
 </body>
 </html>
