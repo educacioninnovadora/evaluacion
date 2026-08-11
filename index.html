@@ -14,7 +14,7 @@
         }
 
         .header-bg {
-            background-color: #008272; /* Color institucional estilo MS Forms (Teal) */
+            background-color: #008272; 
             height: 140px;
             width: 100%;
             position: absolute;
@@ -64,7 +64,7 @@
         }
 
         .required-notice {
-            color: #a4262c; /* Rojo Microsoft */
+            color: #a4262c;
             font-size: 13px;
             margin-bottom: 20px;
             font-weight: 600;
@@ -82,7 +82,7 @@
         }
 
         .required-asterisk {
-            color: #a4262c !important; /* Rojo Microsoft */
+            color: #a4262c !important;
             margin-left: 4px;
             font-weight: bold;
         }
@@ -199,7 +199,6 @@
             cursor: not-allowed;
         }
 
-        /* Vistas de Resultados y Retroalimentación */
         .results-header {
             text-align: center;
             border-bottom: 1px solid #e1dfdd;
@@ -233,12 +232,12 @@
         }
 
         .feedback-item.correct {
-            border-left: 4px solid #107c41; /* Verde éxito de MS Excel/Forms */
+            border-left: 4px solid #107c41; 
             background-color: #f1faf1;
         }
 
         .feedback-item.incorrect {
-            border-left: 4px solid #a4262c; /* Rojo error de MS Forms */
+            border-left: 4px solid #a4262c; 
             background-color: #fdf3f4;
         }
 
@@ -457,6 +456,9 @@
             let feedbackHTML = '';
             let respuestasDetalle = [];
 
+            // AQUI ESTÁ LA MAGIA: Extraemos los IDs y creamos el texto (ej: "12, 45, 3, 22...")
+            const idsPreguntas = selectedQuestions.map(q => q.id).join(", ");
+
             selectedQuestions.forEach((q, index) => {
                 const selected = document.querySelector(`input[name="question_${index}"]:checked`);
                 const selectedVal = selected ? parseInt(selected.value, 10) : -1;
@@ -477,7 +479,7 @@
                         <div class="feedback-status ${isCorrect ? 'status-correct' : 'status-incorrect'}">
                             ${isCorrect ? '✓ Correcto' : '✗ Incorrecto'}
                         </div>
-                        <div class="question-text">${index + 1}. ${q.text}</div>
+                        <div class="question-text">${index + 1}. ${q.text} (ID: ${q.id})</div>
                         <div class="user-answer">Tu respuesta: ${respuestaTexto}</div>
                         ${!isCorrect ? `<div class="correct-answer-display">Respuesta correcta: ${q.options[q.correct]}</div>` : ''}
                         <div class="feedback-text">
@@ -503,6 +505,13 @@
                         nombreCompleto: nombreVal,
                         puntaje: score,
                         calificacion: score,
+                        
+                        // AQUÍ ENVIAMOS EL LISTADO AL SCRIPT
+                        // Mando varias opciones comunes para asegurar que coincida con el nombre que busca tu base de datos
+                        listadoPreguntas: idsPreguntas,
+                        listado_preguntas: idsPreguntas,
+                        preguntas: idsPreguntas,
+                        
                         respuestas: respuestasDetalle,
                         fecha: new Date().toISOString()
                     })
