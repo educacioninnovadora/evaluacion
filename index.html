@@ -332,6 +332,7 @@
         <div class="card" id="successCard" style="display: none;">
             <div class="results-header">
                 <h1 style="color: #008272; margin-bottom: 10px;">¡Examen Finalizado!</h1>
+                <p id="studentNameDisplay" style="font-size: 16px; font-weight: 600; color: #323130; margin-bottom: 10px;"></p>
                 <p>Tus respuestas han sido procesadas e ingresadas con éxito en el sistema de calificaciones.</p>
                 
                 <div class="score-badge" id="scoreValue">0 / 100</div>
@@ -349,10 +350,8 @@
     </div>
 
     <script>
-        // CONFIGURACIÓN: Pega aquí la URL de tu Web App ejecutada en Google Apps Script
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx16R-SSl9w5cKZ_UMGn2TvRHnoz_sy6oqbACSrs-tzkwNkrHXlChU-C90_IGso9v9m/exec";
 
-        // Banco completo de 50 preguntas con sus respuestas y "Refuerzo" (Retroalimentación)
         const questionBank = [
             { id: 1, text: "¿Cuál es el orden correcto de los 4 niveles del modelo de Kirkpatrick?", options: ["Reacción, aprendizaje, comportamiento, resultado", "Resultado, comportamiento, aprendizaje, reacción", "Aprendizaje, reacción, resultado, comportamiento", "Reacción, resultado, aprendizaje, comportamiento"], correct: 0, feedback: "N1 Reacción (¿les gustó?), N2 Aprendizaje (¿aprendieron?), N3 Comportamiento/Transferencia (¿lo aplican?), N4 Resultado (¿mejoró el negocio?)." },
             { id: 2, text: "El Nivel 3 de Kirkpatrick (Comportamiento) mide:", options: ["Si a los participantes les gustó el curso", "Si aplican lo aprendido en su puesto de trabajo", "Si aprobaron el examen escrito", "Si mejoró el ROI del negocio"], correct: 1, feedback: "El N3 es la META: la transferencia real. No es un examen, es un comportamiento observable en faena." },
@@ -366,7 +365,7 @@
             { id: 10, text: "Un operador contradice al formador con un caso real de su turno. ¿Qué hace un formador con visión de futuro?", options: ["Reafirma su autoridad y sigue con el guion", "Lo escucha, valida su experiencia y la usa como caso", "Le pide guardar sus comentarios para el final", "Lo corrige delante de todos"], correct: 1, feedback: "Valida su experiencia andragógicamente. La horizontalidad permite que el error o caso particular se convierta en una valiosa oportunidad de aprendizaje mutuo." },
             { id: 11, text: "La frase 'el formador activa la experiencia del otro, de forma simétrica-similar' describe el principio de:", options: ["Flexibilidad", "Participación", "Horizontalidad", "Motivación"], correct: 2, feedback: "Horizontalidad: El formador y el adulto están al mismo nivel jerárquico de respeto intelectual y técnico, intercambiando experiencias simétricas." },
             { id: 12, text: "¿Cuál es la diferencia central entre pedagogía y andragogía?", options: ["La pedagogía es para adultos y la andragogía para niños", "No hay diferencia real", "La andragogía solo se usa en línea", "El alumno es dependiente; el adulto es co-decisor de su aprendizaje"], correct: 3, feedback: "El adulto tiene autoconcepto de independencia y autonomía, por lo tanto, debe co-decidir y participar activamente en el proceso educativo." },
-            { id: 13, text: "En una capacitación, el instructor habla el 80 % del tiempo y los operadores escuchan. ¿Qué afirmas?", options: ["Es pedagogía: el adulto queda pasivo y aprende poco", "Es andragogía bien aplicada", "Es lo ideal para adultos con experiencia", "Es correcto si el tema es técnico"], correct: 0, feedback: "Un adulto pasivo retiene muy poco. Las sesiones expositivas largas vulneran el principio de participación activa." },
+            { id: 13, text: "En una capacitación, el instructor habla el 80 % del tiempo y los operadores escuchan. ¿Qué afirmas?", options: ["Es pedagogía: el adulto queda pasivo y aprende poco", "Es andragogía bien applied", "Es lo ideal para adultos con experiencia", "Es correcto si el tema es técnico"], correct: 0, feedback: "Un adulto pasivo retiene muy poco. Las sesiones expositivas largas vulneran el principio de participación activa." },
             { id: 14, text: "Quieres que lo aprendido se aplique en el turno. ¿Qué estrategia lo asegura mejor?", options: ["Agregar más teoría y diapositivas", "Practicar la tarea real en condiciones de faena con retroalimentación", "Tomar una prueba escrita más difícil", "Alargar la duración del curso"], correct: 1, feedback: "La práctica simulada interactiva bajo condiciones idénticas a las de su turno, complementada con feedback inmediato, maximiza la transferencia." },
             { id: 15, text: "Para que una habilidad se aplique en el turno, lo más efectivo es:", options: ["Agregar más teoría", "Mostrar más diapositivas", "Practicarla en condiciones similares a la faena", "Tomar un examen escrito"], correct: 2, feedback: "El entrenamiento técnico requiere simulación pragmática y repetición en un ambiente seguro que emule la realidad operativa." },
             { id: 16, text: "Un operador pregunta '¿para qué me sirve esto?' en los primeros minutos. ¿Qué indica?", options: ["Que es un operador conflictivo", "Que hay que sancionarlo", "Que no quiere aprender", "Que necesita ver la utilidad inmediata (regla de 3 minutos)"], correct: 3, feedback: "Regla de los 3 minutos: El adulto necesita comprender de inmediato el valor práctico, la utilidad y el beneficio directo de lo que aprenderá." },
@@ -402,13 +401,12 @@
             { id: 46, text: "Un reto típico del aprendizaje a distancia en minería es:", options: ["Exceso de tiempo libre", "Turnos rotativos, conectividad limitada.", "Participantes muy jóvenes", "Aulas de sobra y excelente señal"], correct: 1, feedback: "El ecosistema industrial minero impone limitaciones geográficas y de jornada de trabajo que exigen herramientas flexibles asincrónicas." },
             { id: 47, text: "En el aprendizaje a distancia, el adulto enfrenta:", options: ["Mayor atención que en presencial", "Ningún problema de atención", "Atención fragmentada y fatiga de pantalla", "Lo mismo que en presencial"], correct: 2, feedback: "A distancia hay atención fragmentada, fatiga cognitiva y pérdida del lenguaje corporal. Por ello, se debe diseñar bajo la modalidad de micro-cápsulas." },
             { id: 48, text: "La duración recomendada de una micro-cápsula de aprendizaje es:", options: ["45 a 60 minutos", "Cerca de 2 horas", "Un día completo", "5 a 12 minutos"], correct: 3, feedback: "Microlearning: cápsulas de 5 a 12 min, móviles y de consumo inmediato entre turnos, ideales para combatir la fatiga cognitiva de pantallas." },
-            { id: 49, text: "El rol de las universidades corporativas frente al formador es:", options: ["Amplificarlo: registran, replican y escalan su conocimiento", "Reemplazarlo", "Eliminarlo", "No aportan nada"], correct: 0, feedback: "No reemplazan al facilitador experto en terreno; en su lugar, estandarizan, documentan y sistematizan sus saberes para hacerlos escalables." },
+            { id: 49, text: "El rol de las universidades corporativas frente al formador es:", options: ["Amplificarlo: registran, replican y escalan su conocimiento", "Reemplazarlo", "Eliminarlo", "No aportan nada"], correct: 0, feedback: "No reemplazan al facilitador experto en terreno; en su lugar, estandarizan, documentan y systematizan sus saberes para hacerlos escalables." },
             { id: 50, text: "El cambio de rol que propone el Track para el formador es:", options: ["De facilitador a instructor", "De formador a facilitador de experiencias de aprendizaje", "A evaluador", "A administrador"], correct: 1, feedback: "El facilitador andragógico evoluciona de ser 'el sabelotodo' que expone teorías, a un diseñador activo de dinámicas que detona la práctica colectiva." }
         ];
 
         let selectedQuestions = [];
 
-        // Inicializar el Examen: Seleccionar 10 aleatorias sin repetir
         function initQuiz() {
             const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
             selectedQuestions = shuffled.slice(0, 10);
@@ -424,7 +422,7 @@
                 q.options.forEach((opt, optIndex) => {
                     optionsHTML += `
                         <label class="option-container">${opt}
-                            <input type="radio" name="q_${q.id}" value="${optIndex}" required>
+                            <input type="radio" name="question_${index}" value="${optIndex}" required>
                             <span class="checkmark"></span>
                         </label>
                     `;
@@ -440,7 +438,6 @@
             });
         }
 
-        // Evento botón Avanzar
         document.getElementById('btnNext').addEventListener('click', function() {
             const nombreInput = document.getElementById('nombre');
             if (!nombreInput.checkValidity()) {
@@ -452,19 +449,28 @@
             initQuiz();
         });
 
-        // Procesar Examen al Enviar
         document.getElementById('quizForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
+            const nombreVal = document.getElementById('nombre').value.trim();
             let score = 0;
             let feedbackHTML = '';
+            let respuestasDetalle = [];
 
             selectedQuestions.forEach((q, index) => {
-                const selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
-                const selectedVal = selected ? parseInt(selected.value) : -1;
+                const selected = document.querySelector(`input[name="question_${index}"]:checked`);
+                const selectedVal = selected ? parseInt(selected.value, 10) : -1;
                 const isCorrect = selectedVal === q.correct;
 
                 if (isCorrect) score += 10;
+
+                const respuestaTexto = selectedVal !== -1 ? q.options[selectedVal] : 'No registrada';
+
+                respuestasDetalle.push({
+                    pregunta: q.text,
+                    respuestaUsuario: respuestaTexto,
+                    esCorrecta: isCorrect
+                });
 
                 feedbackHTML += `
                     <div class="feedback-item ${isCorrect ? 'correct' : 'incorrect'}">
@@ -472,7 +478,7 @@
                             ${isCorrect ? '✓ Correcto' : '✗ Incorrecto'}
                         </div>
                         <div class="question-text">${index + 1}. ${q.text}</div>
-                        <div class="user-answer">Tu respuesta: ${selectedVal !== -1 ? q.options[selectedVal] : 'Sin responder'}</div>
+                        <div class="user-answer">Tu respuesta: ${respuestaTexto}</div>
                         ${!isCorrect ? `<div class="correct-answer-display">Respuesta correcta: ${q.options[q.correct]}</div>` : ''}
                         <div class="feedback-text">
                             <div class="feedback-title">Refuerzo / Retroalimentación:</div>
@@ -482,17 +488,24 @@
                 `;
             });
 
+            document.getElementById('studentNameDisplay').textContent = `Participante: ${nombreVal}`;
             document.getElementById('scoreValue').textContent = `${score} / 100`;
+            document.getElementById('scoreText').textContent = `Puntaje obtenido por ${nombreVal}`;
             document.getElementById('feedbackContainer').innerHTML = feedbackHTML;
 
-            // Envío opcional a Google Apps Script
-            const nombreVal = document.getElementById('nombre').value;
             if (WEB_APP_URL) {
                 fetch(WEB_APP_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nombre: nombreVal, puntaje: score, fecha: new Date().toISOString() })
+                    body: JSON.stringify({ 
+                        nombre: nombreVal,
+                        nombreCompleto: nombreVal,
+                        puntaje: score,
+                        calificacion: score,
+                        respuestas: respuestasDetalle,
+                        fecha: new Date().toISOString()
+                    })
                 }).catch(err => console.error("Error al enviar registro:", err));
             }
 
