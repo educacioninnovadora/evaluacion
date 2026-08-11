@@ -306,19 +306,25 @@
                 </div>
                 <div class="required-notice">* Obligatorio</div>
                 
-                <div class="form-group">
+                <!-- PASO 1: Captura de Nombre -->
+                <div id="stepName" class="form-group">
                     <label class="main-label" for="nombre">Nombre Completo<span class="required-asterisk">*</span></label>
                     <input type="text" id="nombre" required placeholder="Escriba su respuesta">
+                    <div style="margin-top: 25px;">
+                        <button type="button" id="btnNext" class="btn-submit">Avanzar</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Contenedor de Preguntas Dinámicas -->
-            <div class="card">
-                <div id="questionsContainer"></div>
-            </div>
+            <!-- PASO 2: Contenedor de Preguntas Dinámicas (Oculto al inicio) -->
+            <div id="stepQuestions" style="display: none;">
+                <div class="card">
+                    <div id="questionsContainer"></div>
+                </div>
 
-            <div style="margin-bottom: 40px;">
-                <button type="submit" id="submitBtn" class="btn-submit">Enviar respuestas</button>
+                <div style="margin-bottom: 40px;">
+                    <button type="submit" id="submitBtn" class="btn-submit">Enviar respuestas</button>
+                </div>
             </div>
         </form>
 
@@ -434,138 +440,66 @@
             });
         }
 
-        // Manejar el envío
-        document.getElementById('quizForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Enviando respuestas...";
-
-            const nombre = document.getElementById('nombre').value;
-            const hora = new Date().toLocaleString('es-CL', { timeZone: 'America/Santiago' }) || new Date().toLocaleString();
-            
-            let calificacion = 0;
-            let listadoPreguntasArr = [];
-            let userAnswers = {};
-
-            selectedQuestions.forEach(q => {
-                listadoPreguntasArr.push(q.id);
-                const selectedOpt = document.querySelector(`input[name="q_${q.id}"]:checked`);
-                const answerVal = selectedOpt ? parseInt(selectedOpt.value) : -1;
-                userAnswers[q.id] = answerVal;
-                
-                if (answerVal === q.correct) {
-                    calificacion += 10; // 10 puntos por cada acierto de un total de 10 preguntas
-                }
-            });
-
-            const listadoPreguntas = listadoPreguntasArr.join(',');
-
-            // Enviar datos por POST a Google Sheets
-            const payload = {
-                nombre: nombre,
-                hora: hora,
-                calificacion: calificacion,
-                listadoPreguntas: listadoPreguntas
-            };
-
-            fetch(WEB_APP_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            })
-            .then(() => {
-                // Ocultar formulario
-                document.getElementById('quizForm').style.display = 'none';
-                
-                // Mostrar pantalla de éxito y cargar la retroalimentación
-                const successCard = document.getElementById('successCard');
-                successCard.style.display = 'block';
-                
-                // Actualizar puntuación en la UI
-                const scoreValue = document.getElementById('scoreValue');
-                scoreValue.innerText = `${calificacion} / 100`;
-                
-                if (calificacion >= 70) {
-                    scoreValue.style.backgroundColor = "#107c41"; // Verde de aprobación
-                    document.getElementById('scoreText').innerText = "¡Felicidades, examen aprobado!";
-                } else {
-                    scoreValue.style.backgroundColor = "#a4262c"; // Rojo desaprobación
-                    document.getElementById('scoreText').innerText = "Examen no aprobado. Sigue practicando.";
-                }
-
-                // Generar lista de retroalimentación detallada
-                buildFeedbackUI(userAnswers);
-                window.scrollTo(0,0);
-            })
-            .catch(error => {
-                console.error('Error al enviar las respuestas:', error);
-                alert('Ocurrió un inconveniente al registrar tus respuestas. Por favor, reintenta el envío.');
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Enviar respuestas";
-            });
+        // Evento botón Avanzar
+        document.getElementById('btnNext').addEventListener('click', function() {
+            const nombreInput = document.getElementById('nombre');
+            if (!nombreInput.checkValidity()) {
+                nombreInput.reportValidity();
+                return;
+            }
+            document.getElementById('stepName').style.display = 'none';
+            document.getElementById('stepQuestions').style.display = 'block';
+            initQuiz();
         });
 
-        // Generar la interfaz de revisión y retroalimentación interactiva
-        function buildFeedbackUI(userAnswers) {
-            const feedbackContainer = document.getElementById('feedbackContainer');
-            feedbackContainer.innerHTML = '';
+        // Procesar Examen al Enviar
+        document.getElementById('quizForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            let score = 0;
+            let feedbackHTML = '';
 
             selectedQuestions.forEach((q, index) => {
-                const userAnswerIndex = userAnswers[q.id];
-                const isCorrect = userAnswerIndex === q.correct;
-                const feedbackDiv = document.createElement('div');
-                
-                feedbackDiv.className = `feedback-item ${isCorrect ? 'correct' : 'incorrect'}`;
+                const selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
+                const selectedVal = selected ? parseInt(selected.value) : -1;
+                const isCorrect = selectedVal === q.correct;
 
-                let statusHTML = '';
-                if (isCorrect) {
-                    statusHTML = `
-                        <div class="feedback-status status-correct">
-                            <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                            </svg>
-                            Pregunta ${index + 1}: Correcta
+                if (isCorrect) score += 10;
+
+                feedbackHTML += `
+                    <div class="feedback-item ${isCorrect ? 'correct' : 'incorrect'}">
+                        <div class="feedback-status ${isCorrect ? 'status-correct' : 'status-incorrect'}">
+                            ${isCorrect ? '✓ Correcto' : '✗ Incorrecto'}
                         </div>
-                    `;
-                } else {
-                    statusHTML = `
-                        <div class="feedback-status status-incorrect">
-                            <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                            </svg>
-                            Pregunta ${index + 1}: Incorrecta
+                        <div class="question-text">${index + 1}. ${q.text}</div>
+                        <div class="user-answer">Tu respuesta: ${selectedVal !== -1 ? q.options[selectedVal] : 'Sin responder'}</div>
+                        ${!isCorrect ? `<div class="correct-answer-display">Respuesta correcta: ${q.options[q.correct]}</div>` : ''}
+                        <div class="feedback-text">
+                            <div class="feedback-title">Refuerzo / Retroalimentación:</div>
+                            ${q.feedback}
                         </div>
-                    `;
-                }
-
-                const selectedText = userAnswerIndex !== -1 ? q.options[userAnswerIndex] : "Ninguna opción seleccionada";
-                const correctText = q.options[q.correct];
-
-                feedbackDiv.innerHTML = `
-                    ${statusHTML}
-                    <div style="font-weight: 600; font-size: 15px; margin-bottom: 10px;">${q.text}</div>
-                    <div class="user-answer">
-                        <strong>Tu respuesta:</strong> <span style="color: ${isCorrect ? '#107c41' : '#a4262c'}">${selectedText}</span>
-                    </div>
-                    ${!isCorrect ? `<div class="correct-answer-display"><strong>Respuesta correcta:</strong> ${correctText}</div>` : ''}
-                    
-                    <div class="feedback-text">
-                        <div class="feedback-title">Refuerzo Educativo</div>
-                        ${q.feedback}
                     </div>
                 `;
-
-                feedbackContainer.appendChild(feedbackDiv);
             });
-        }
 
-        // Cargar preguntas en la carga de página
-        window.onload = initQuiz;
+            document.getElementById('scoreValue').textContent = `${score} / 100`;
+            document.getElementById('feedbackContainer').innerHTML = feedbackHTML;
+
+            // Envío opcional a Google Apps Script
+            const nombreVal = document.getElementById('nombre').value;
+            if (WEB_APP_URL) {
+                fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nombre: nombreVal, puntaje: score, fecha: new Date().toISOString() })
+                }).catch(err => console.error("Error al enviar registro:", err));
+            }
+
+            document.getElementById('quizForm').style.display = 'none';
+            document.getElementById('successCard').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
     </script>
 </body>
 </html>
